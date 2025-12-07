@@ -8,8 +8,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "docusaurus": "docusaurus",
-    "start": "cd website && npm start",
-    "build": "cd website && npm build",
+    "start": "cd website && npm run start",
+    "build": "cd website && npm run build",
     "swizzle": "cd website && npm swizzle",
     "deploy": "cd website && npm deploy",
     "clear": "cd website && npm clear",
