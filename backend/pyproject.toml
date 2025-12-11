@@ -1,0 +1,32 @@
+[project]
+name = "website-embedding-pipeline"
+version = "0.1.0"
+description = "A pipeline that crawls websites, extracts text, generates embeddings, and stores them in Qdrant"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.2",
+    "cohere>=4.5.3",
+    "qdrant-client>=1.7.0",
+    "python-dotenv>=1.0.0",
+    "fastapi>=0.104.0",
+    "openai>=1.3.0",
+    "pydantic>=2.0.0",
+    "uvicorn>=0.24.0",
+    "slowapi>=0.1.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "black>=23.7.0",
+    "flake8>=6.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]

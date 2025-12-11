@@ -1,0 +1,64 @@
+{
+  "queries": [
+    {
+      "id": "factual_001",
+      "text": "What is the primary goal of the physical AI course?",
+      "type": "factual",
+      "expected_section": "Course objectives and goals",
+      "metadata": {
+        "difficulty": "easy",
+        "domain": "course-introduction"
+      }
+    },
+    {
+      "id": "factual_002",
+      "text": "List the core modules of the Physical AI & Humanoid Robotics course.",
+      "type": "factual",
+      "expected_section": "Curriculum structure with four core modules",
+      "metadata": {
+        "difficulty": "medium",
+        "domain": "curriculum"
+      }
+    },
+    {
+      "id": "conceptual_001",
+      "text": "How does the integration of ROS 2 and simulation technologies enable advanced robotics development?",
+      "type": "conceptual",
+      "expected_section": "ROS 2 and simulation integration concepts",
+      "metadata": {
+        "difficulty": "hard",
+        "domain": "ros2-simulation"
+      }
+    },
+    {
+      "id": "conceptual_002",
+      "text": "Explain the relationship between Vision-Language-Action systems and humanoid robot control.",
+      "type": "conceptual",
+      "expected_section": "VLA system principles and applications",
+      "metadata": {
+        "difficulty": "hard",
+        "domain": "vla-systems"
+      }
+    },
+    {
+      "id": "section_specific_001",
+      "text": "What are the key concepts covered in the AI-Brain module?",
+      "type": "section-specific",
+      "expected_section": "AI-Brain module content",
+      "metadata": {
+        "difficulty": "medium",
+        "domain": "ai-brain-module"
+      }
+    },
+    {
+      "id": "section_specific_002",
+      "text": "Find information about Gazebo simulation in the course materials.",
+      "type": "section-specific",
+      "expected_section": "Gazebo simulation section",
+      "metadata": {
+        "difficulty": "medium",
+        "domain": "gazebo-simulation"
+      }
+    }
+  ]
+}
