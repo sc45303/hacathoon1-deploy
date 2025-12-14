@@ -15,6 +15,7 @@ const ChatbotWidget = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [currentModule, setCurrentModule] = React.useState('');
   const [currentChapter, setCurrentChapter] = React.useState('');
+  const [currentSessionId, setCurrentSessionId] = React.useState('');
   const messagesEndRef = React.useRef(null);
 
   // API configuration
@@ -51,15 +52,14 @@ const ChatbotWidget = () => {
     setIsLoading(true);
 
     try {
-      // Prepare the request payload
+      // Prepare the request payload - match the backend API
       const requestBody = {
-        question: inputValue,
-        module_context: currentModule || undefined,
-        chapter_context: currentChapter || undefined
+        query: inputValue,
+        session_id: currentSessionId || undefined
       };
 
-      // Make API call to RAG backend
-      const response = await fetch(`${API_BASE_URL}/chat`, {
+      // Make API call to RAG backend - use the correct endpoint
+      const response = await fetch(`${API_BASE_URL}/ask`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,13 +73,18 @@ const ChatbotWidget = () => {
 
       const data = await response.json();
 
+      // Update session ID if new one was returned
+      if (data.query_id && !currentSessionId) {
+        setCurrentSessionId(data.query_id);
+      }
+
       // Create bot message from API response
       const botMessage = {
         id: Date.now() + 1,
         text: data.answer,
         sender: 'bot',
-        sources: data.sources,
-        confidence: data.confidence,
+        sources: data.sources?.map(source => source.content.substring(0, 100) + '...') || [],  // Just content preview as source
+        confidence: data.confidence_score || 0.8,  // Use confidence_score from response or default
         timestamp: new Date().toISOString()
       };
 
@@ -135,8 +140,8 @@ const ChatbotWidget = () => {
     <div className={`rag-chatbot ${isOpen ? 'open' : ''}`}>
       {/* Chatbot button */}
       {!isOpen && (
-        <button 
-          className="chatbot-button" 
+        <button
+          className="chatbot-button"
           onClick={toggleChatbot}
           style={{
             position: 'fixed',
@@ -160,7 +165,7 @@ const ChatbotWidget = () => {
 
       {/* Chatbot window */}
       {isOpen && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             bottom: '20px',
@@ -176,7 +181,7 @@ const ChatbotWidget = () => {
             boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
           }}
         >
-          <div 
+          <div
             style={{
               backgroundColor: '#007cba',
               color: 'white',
@@ -190,7 +195,7 @@ const ChatbotWidget = () => {
               <h3 style={{ margin: 0, fontSize: '16px' }}>CourseBot</h3>
               <p style={{ margin: 0, fontSize: '12px', opacity: 0.9 }}>Ask anything about the Physical AI & Humanoid Robotics Course</p>
             </div>
-            <button 
+            <button
               onClick={toggleChatbot}
               style={{
                 background: 'none',
@@ -204,7 +209,7 @@ const ChatbotWidget = () => {
             </button>
           </div>
 
-          <div 
+          <div
             style={{
               flex: 1,
               padding: '16px',
@@ -290,7 +295,7 @@ const ChatbotWidget = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          <div 
+          <div
             style={{
               padding: '12px',
               backgroundColor: 'white',
@@ -330,7 +335,7 @@ const ChatbotWidget = () => {
             </button>
           </div>
 
-          <div 
+          <div
             style={{
               padding: '4px 12px 8px',
               fontSize: '12px',

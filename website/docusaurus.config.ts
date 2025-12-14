@@ -72,11 +72,11 @@ const config: Config = {
     image: 'img/docusaurus-social-card.jpg',
     colorMode: { respectPrefersColorScheme: true },
     navbar: {
-      title: 'Physical AI Course',
-      logo: { alt: 'Physical AI & Humanoid Robotics Course Logo', src: 'img/logo.png' },
+      title: 'Physical AI Course',  
+      logo: { alt: 'Physical AI & Humanoid Robotics Course Logo', src: 'img/icon/.png' },
       items: [
         { type: 'docSidebar', sidebarId: 'tutorialSidebar', position: 'left', label: 'Modules' },
-        { href: 'https://github.com/physicalai-course/physical-ai-humanoid-course', label: 'GitHub', position: 'right' },
+        { href: 'https://github.com/sc45303/hacathoon1-deploy', label: 'GitHub', position: 'right' },
       ],
     },
     footer: {
@@ -85,22 +85,22 @@ const config: Config = {
         {
           title: 'Modules',
           items: [
-            { label: 'Module 1: ROS 2', to: '/modules/ros2/intro' },
-            { label: 'Module 2: Simulation', to: '/modules/simulation/intro' },
-            { label: 'Module 3: Isaac', to: '/modules/isaac/intro' },
-            { label: 'Module 4: VLA', to: '/modules/vla/intro' },
+            { label: 'Module 1: ROS 2', to: '/docs/modules/ros2/intro' },
+            { label: 'Module 2: Simulation', to: '/docs/modules/simulation/intro' },
+            { label: 'Module 3: Isaac', to: '/docs/modules/isaac/intro' },
+            { label: 'Module 4: VLA', to: '/docs/modules/vla/intro' },
           ],
         },
         {
           title: 'Community',
           items: [
-            { label: 'Discord', href: 'https://discordapp.com/invite/physicalai' },
-            { label: 'X', href: 'https://x.com/physicalai' },
+            { label: 'Discord', href: 'https://discordapp.com' },
+            { label: 'X', href: 'https://x.com' },
           ],
         },
         {
           title: 'More',
-          items: [{ label: 'GitHub', href: 'https://github.com/physicalai-course/physical-ai-humanoid-course' }],
+          items: [{ label: 'GitHub', href: 'https://github.com/sc45303/hacathoon1-deploy' }],
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Physical AI & Humanoid Robotics Course. Built with Docusaurus.`,
