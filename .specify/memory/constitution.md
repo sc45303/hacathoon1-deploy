@@ -1,75 +1,98 @@
 <!-- SYNC IMPACT REPORT
-Version change: N/A → 1.0.0
-Added sections: All principles and sections as defined below
-Removed sections: None
+Version change: 1.0.0 → 1.1.0
+Added sections: AI-Native Design, Source Grounding, Beginner Clarity, Modularity, Spec-Driven Development, Determinism, Safety principles
+Removed sections: Physical AI & Humanoid Robotics specific principles
 Templates requiring updates: ✅ No updates needed - .specify/templates/plan-template.md, .specify/templates/spec-template.md, .specify/templates/tasks-template.md, .qwen/commands/*.toml
 Follow-up TODOs: None
-Modified principles: None
+Modified principles: Changed from Physical AI & Humanoid Robotics course to AI-Native Book with RAG Chatbot
 -->
-# Physical AI & Humanoid Robotics Course Constitution
+# Project Constitution: Unified AI-Native Book with Integrated RAG Chatbot
 
 ## Core Principles
 
-### I. Accuracy
-All explanations must reflect correct robotics, AI, and simulation engineering concepts. Content must be technically sound, factually accurate, and represent real-world implementations of ROS 2, Gazebo, NVIDIA Isaac, and Vision-Language-Action systems.
+### I. AI-Native Design
+The system must follow a retrieval-first, generation-second architecture. All AI processing should prioritize retrieving relevant information from the book content before any generation occurs, ensuring that all responses are grounded in the book's content.
 
-### II. Clarity
-Use beginner-to-intermediate–friendly explanations, visuals, and examples. All content must be accessible to students new to robotics and AI, with clear language, well-defined terminology, and helpful analogies that illuminate complex concepts.
+### II. Source Grounding
+The chatbot must ONLY answer from book content. No external knowledge sources are allowed, and all responses must be directly tied to information present in the book to prevent hallucinations and maintain accuracy.
 
-### III. Depth & Rigor
-Go deep into ROS 2, simulation, Isaac, VLA pipelines, and humanoid mechanics. Each topic must cover theoretical foundations, practical implementations, and real-world applications with sufficient technical detail for students to build actual systems.
+### III. Beginner Clarity
+Every component must be understandable by a junior developer. All code, architecture decisions, and documentation must be clear, well-commented, and approachable to developers with limited experience in AI systems, RAG, or backend development.
 
-### IV. Traceability
-Each section must have a clear purpose and refer back to the core curriculum. All content must connect explicitly to the four core modules (ROS 2, Simulation, AI-Brain, VLA) and the final capstone Autonomous Humanoid project.
+### IV. Modularity
+Each system layer must be cleanly separated. The frontend book, backend services, AI layer, and data storage must operate as distinct units with clear interfaces, allowing for independent development, testing, and maintenance.
 
-### V. Spec-Driven Workflow
-Every step of the project (chapters, diagrams, API code, chatbot workflows) must be generated via: /sp.specify → Requirements, /sp.plan → Strategy, /sp.tasks → Task breakdown, /sp.implementation → Final structured output. This ensures consistency, traceability, and quality across all deliverables.
+### V. Spec-Driven Development
+No direct coding without an approved spec. All development must follow the Spec-Kit Plus workflow: /sp.specify → Requirements, /sp.plan → Strategy, /sp.tasks → Task breakdown, /sp.implementation → Final output. This ensures consistency, traceability, and quality across all deliverables.
 
-### VI. Zero Ambiguity
-All specs must be deterministic, repeatable, and machine-actionable. Documentation and code must be precise enough that any developer can reproduce the exact same results, with no room for interpretation or guesswork in implementation steps.
+### VI. Determinism
+Same input + same context → predictable output. The system must behave consistently, returning the same or equivalent responses when presented with identical queries and contextual information.
 
-## Constraints and Standards
+### VII. Safety
+No hallucinated answers outside provided context. The system must be strictly constrained to generate responses based only on retrieved text from the book content, with appropriate responses when questions cannot be answered from available sources.
 
-### Technology Stack Compliance
-- Follow Docusaurus folder structures and documentation standards for book creation.
-- Use simple, understandable English appropriate for international audiences.
-- No hallucinated technologies or APIs - all implementations must be grounded in existing, accessible tools.
-- All RAG outputs must be grounded in book data with citations and references.
-- Code must be runnable and deployable as-is with minimal setup requirements.
-- Deployed book must function on GitHub Pages with embedded chatbot capabilities.
+## System Components and Architecture
 
-### Content Quality Standards
-- All explanations must be technically accurate and validated against real-world implementations.
-- Hands-on labs must include step-by-step workflows with expected outcomes.
-- Visual aids (diagrams, charts, code examples) must clarify complex concepts.
-- Content must be structured by learning progression, building from fundamentals to advanced topics.
+### Frontend Book
+- Built with Docusaurus as a static site
+- Already deployed and treated as read-only for this phase
+- Hosts the embedded chatbot UI within the book pages
 
-## Development Workflow
+### Backend Services
+- Located at /backend within the existing repository
+- Built using FastAPI for high-performance, asynchronous operation
+- Serves as the single source of truth for chatbot logic and data processing
+- Must be deployable independently from the frontend book
 
-### Book Creation Process
-- Written using Docusaurus documentation framework.
-- Structured by AI through Spec-Kit Plus for consistency and quality.
-- Authored using Claude Code for technical accuracy and pedagogical effectiveness.
-- Deployed to GitHub Pages with responsive design for accessibility.
-- Includes hands-on labs covering ROS 2, Gazebo, and Isaac Sim practical implementations.
+### AI Layer
+- OpenAI Agents / ChatKit SDK for intelligent query processing
+- Used for embeddings and response generation
+- Agents must be strictly constrained to retrieved context from the book
+- Follow retrieval-first, generation-second design principles
 
-### RAG Chatbot System
-- Embedded inside the published book interface for seamless user experience.
-- Built with OpenAI Agents / ChatKit SDK for robust question answering.
-- Implemented with FastAPI backend for scalable, reliable service.
-- Utilizes Neon Serverless Postgres for logs and conversation memory.
-- Powered by Qdrant Cloud Free Tier for embeddings and vector search.
-- Answers must derive exclusively from book content to prevent hallucinations.
-- Capabilities include full-book comprehension and focused text-selection responses.
+### Data Layer
+- Neon Serverless Postgres for storing book text, chapters, sections, and metadata
+- Qdrant Cloud (Free Tier) for storing vector embeddings
+- Qdrant used exclusively for semantic retrieval operations
+- Connection pooling must be properly implemented for Neon Serverless
 
-### Curriculum Structure
-- Organized around four core modules: ROS 2, Simulation, AI-Brain, VLA.
-- Culminates in Autonomous Humanoid capstone project integrating all previous concepts.
-- Each module builds systematically toward student ability to create simulated humanoid robots.
-- Robot abilities include receiving voice commands, using AI brains with ROS 2, navigating and manipulating objects in simulation.
+### RAG Logic
+- Query → embedding → vector search workflow
+- Retrieve relevant book chunks based on semantic similarity
+- Construct bounded context from retrieved content
+- Generate answer ONLY from retrieved text and provided context
+- Handle selected-text-only answering capability
+
+## Special Capabilities
+
+### Selected-Text-Only Answering
+When users provide selected text, the system must:
+- Ignore the rest of the book content temporarily
+- Answer strictly from the provided selected content
+- Maintain all safety and grounding constraints within the selected context
+
+## Standards and Technologies
+
+### Technical Standards
+- Python 3.11+ for all backend development
+- FastAPI for HTTP layer implementation
+- Pydantic for data validation and serialization
+- Async-first design for optimal performance
+- Environment variables for all secrets and configuration
+- No hardcoded keys, credentials, or configuration values
+
+### Deployment and Operation
+- Backend must be deployable independently from the frontend
+- Must respect Qdrant Free Tier limits and usage guidelines
+- Proper error handling and graceful degradation when resources are limited
+- Comprehensive logging and monitoring for debugging and maintenance
 
 ## Governance
 
-This constitution governs all project activities and supersedes any conflicting practices. All contributions must align with these principles to maintain educational quality and technical coherence. Amendments require documentation of rationale, approval by project maintainers, and migration plans for affected content. All specifications, plans, tasks, and implementations must explicitly verify compliance with these principles. All pull requests and reviews must validate constitutional adherence before merging.
+This constitution governs all project activities and supersedes any conflicting practices. All contributions must align with these principles to maintain system quality and adherence to hackathon requirements. 
 
-**Version**: 1.0.0 | **Ratified**: 2025-12-07 | **Last Amended**: 2025-12-07
+Amendments require documentation of rationale, approval by project maintainers, and migration plans for affected components. All specifications, plans, tasks, and implementations must explicitly verify compliance with these principles during development.
+
+All pull requests and reviews must validate constitutional adherence before merging, ensuring the final hackathon submission meets all outlined requirements.
+
+**Version**: 1.1.0 | **Ratified**: 2025-12-07 | **Last Amended**: 2025-12-16
