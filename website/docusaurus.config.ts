@@ -19,16 +19,6 @@ const config: Config = {
     },
   },
 
-  plugins: [
-    async function chatbotPlugin(context, options) {
-      return {
-        name: 'chatbot-plugin',
-        clientModules: [
-          require.resolve('./src/components/ChatbotInjector.jsx'),
-        ],
-      };
-    },
-  ],
 
   url: 'https://physicalai-course.com',
   baseUrl: '/',
@@ -73,7 +63,7 @@ const config: Config = {
     colorMode: { respectPrefersColorScheme: true },
     navbar: {
       title: 'Physical AI Course',  
-      logo: { alt: 'Physical AI & Humanoid Robotics Course Logo', src: 'img/icon/.png' },
+      logo: { alt: 'Physical AI & Humanoid Robotics Course Logo', src: 'img/icon.png' },
       items: [
         { type: 'docSidebar', sidebarId: 'tutorialSidebar', position: 'left', label: 'Modules' },
         { href: 'https://github.com/sc45303/hacathoon1-deploy', label: 'GitHub', position: 'right' },

@@ -33,15 +33,15 @@ export class ChatbotAPIService {
    * Send a query to the backend RAG agent
    */
   async askQuestion(request: AskRequest): Promise<AskResponse> {
-    const response = await fetch(`${this.baseUrl}/ask`, {
+    const response = await fetch(`${this.baseUrl}/agent/query`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        query: request.query,
-        session_id: request.session_id,
-        user_id: request.user_id
+        question: request.query,
+        selected_text: null,  // For now, not using selected text
+        mode: null  // Will default to book RAG mode
       }),
     });
 
@@ -51,7 +51,16 @@ export class ChatbotAPIService {
     }
 
     const data: AskResponse = await response.json();
-    return data;
+
+    // Map the response to the expected format
+    return {
+      response_id: 'response-' + Date.now(),  // Backend doesn't return response_id, so generate one
+      answer: data.answer,
+      sources: data.sources || [],
+      query_id: 'query-' + Date.now(),  // Backend doesn't return query_id, so generate one
+      timestamp: new Date().toISOString(),
+      confidence_score: 0.8  // Backend doesn't return confidence, so use a default
+    };
   }
 
   /**

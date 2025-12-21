@@ -29,14 +29,14 @@ description: "Task list for Backend Skeleton & Bootstrap for RAG Chatbot impleme
 
 **Purpose**: Project initialization and basic structure
 
-- [ ] T001 Create backend root directory in /backend
-- [ ] T002 Create backend sub-structure: /backend/app, /backend/app/api, /backend/app/core, /backend/app/services, /backend/app/db, /backend/app/models
-- [ ] T003 [P] Create placeholder files in /backend/app/api/__init__.py
-- [ ] T004 [P] Create placeholder files in /backend/app/services/__init__.py
-- [ ] T005 [P] Create placeholder files in /backend/app/db/__init__.py
-- [ ] T006 [P] Create placeholder files in /backend/app/models/__init__.py
-- [ ] T007 Create scripts directory in /backend/scripts/
-- [ ] T008 Create placeholder script file in /backend/scripts/__init__.py
+- [x] T001 Create backend root directory in /backend
+- [x] T002 Create backend sub-structure: /backend/app, /backend/app/api, /backend/app/core, /backend/app/services, /backend/app/db, /backend/app/models
+- [x] T003 [P] Create placeholder files in /backend/app/api/__init__.py
+- [x] T004 [P] Create placeholder files in /backend/app/services/__init__.py
+- [x] T005 [P] Create placeholder files in /backend/app/db/__init__.py
+- [x] T006 [P] Create placeholder files in /backend/app/models/__init__.py
+- [x] T007 Create scripts directory in /backend/scripts/
+- [x] T008 Create placeholder script file in /backend/scripts/__init__.py
 
 ---
 
@@ -46,13 +46,13 @@ description: "Task list for Backend Skeleton & Bootstrap for RAG Chatbot impleme
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T009 Create requirements.txt file in /backend/requirements.txt with core dependencies
-- [ ] T010 Create .env.example file in /backend/.env.example with placeholder keys
-- [ ] T011 Create FastAPI entry point with basic initialization in /backend/app/main.py
-- [ ] T012 Create configuration loader using Pydantic in /backend/app/core/config.py
-- [ ] T013 Create basic logging setup in /backend/app/core/logging.py
-- [ ] T014 [P] Create core module init file in /backend/app/core/__init__.py
-- [ ] T015 [P] Create API module init file in /backend/app/api/v1/__init__.py
+- [x] T009 Create requirements.txt file in /backend/requirements.txt with core dependencies
+- [x] T010 Create .env.example file in /backend/.env.example with placeholder keys
+- [x] T011 Create FastAPI entry point with basic initialization in /backend/app/main.py
+- [x] T012 Create configuration loader using Pydantic in /backend/app/core/config.py
+- [x] T013 Create basic logging setup in /backend/app/core/logging.py
+- [x] T014 [P] Create core module init file in /backend/app/core/__init__.py
+- [x] T015 [P] Create API module init file in /backend/app/api/v1/__init__.py
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
@@ -66,10 +66,10 @@ description: "Task list for Backend Skeleton & Bootstrap for RAG Chatbot impleme
 
 ### Implementation for User Story 1
 
-- [ ] T016 [P] [US1] Create HealthResponse Pydantic model in /backend/app/models/__init__.py
-- [ ] T017 [US1] Add health check endpoint to main app in /backend/app/main.py
-- [ ] T018 [US1] Create README.md in /backend/ with project purpose and setup steps
-- [ ] T019 [US1] Add run instructions and health check endpoint documentation to /backend/README.md
+- [x] T016 [P] [US1] Create HealthResponse Pydantic model in /backend/app/models/__init__.py
+- [x] T017 [US1] Add health check endpoint to main app in /backend/app/main.py
+- [x] T018 [US1] Create README.md in /backend/ with project purpose and setup steps
+- [x] T019 [US1] Add run instructions and health check endpoint documentation to /backend/README.md
 
 **Checkpoint**: At this point, User Story 1 should be fully functional and testable independently
 
@@ -83,9 +83,9 @@ description: "Task list for Backend Skeleton & Bootstrap for RAG Chatbot impleme
 
 ### Implementation for User Story 2
 
-- [ ] T020 [P] [US2] Add clear comments explaining future purpose of each directory in __init__.py files
-- [ ] T021 [US2] Add docstrings to the configuration model explaining the structure
-- [ ] T022 [US2] Add clear file headers to all created files with purpose and future use cases
+- [x] T020 [P] [US2] Add clear comments explaining future purpose of each directory in __init__.py files
+- [x] T021 [US2] Add docstrings to the configuration model explaining the structure
+- [x] T022 [US2] Add clear file headers to all created files with purpose and future use cases
 
 **Checkpoint**: At this point, User Stories 1 AND 2 should both work independently
 
@@ -99,9 +99,9 @@ description: "Task list for Backend Skeleton & Bootstrap for RAG Chatbot impleme
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] Enhance README.md with detailed project architecture explanation in /backend/README.md
-- [ ] T024 [US3] Add section about .env.example file usage in /backend/README.md
-- [ ] T025 [US3] Add information about the separation of concerns between different directories in /backend/README.md
+- [x] T023 [US3] Enhance README.md with detailed project architecture explanation in /backend/README.md
+- [x] T024 [US3] Add section about .env.example file usage in /backend/README.md
+- [x] T025 [US3] Add information about the separation of concerns between different directories in /backend/README.md
 
 **Checkpoint**: All user stories should now be independently functional
 
@@ -111,11 +111,11 @@ description: "Task list for Backend Skeleton & Bootstrap for RAG Chatbot impleme
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T026 [P] Update quickstart documentation in specs/007-backend-skeleton-rag/quickstart.md to reflect actual implementation
-- [ ] T027 Validation: Run `uvicorn app.main:app --reload` and confirm server starts successfully
-- [ ] T028 Validation: Confirm /health returns HTTP 200
-- [ ] T029 [P] Validation: Confirm no runtime errors occur during startup
-- [ ] T030 [P] Code cleanup and formatting across all files
+- [x] T026 [P] Update quickstart documentation in specs/007-backend-skeleton-rag/quickstart.md to reflect actual implementation
+- [x] T027 Validation: Run `uvicorn app.main:app --reload` and confirm server starts successfully
+- [x] T028 Validation: Confirm /health returns HTTP 200
+- [x] T029 [P] Validation: Confirm no runtime errors occur during startup
+- [x] T030 [P] Code cleanup and formatting across all files
 
 ---
 
