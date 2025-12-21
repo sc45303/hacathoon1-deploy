@@ -1,0 +1,94 @@
+openapi: 3.0.1
+info:
+  title: RAG Query API
+  description: API for querying book content using Retrieval Augmented Generation
+  version: 1.0.0
+paths:
+  /query:
+    post:
+      summary: Query book content with natural language question
+      description: Accepts a natural language question and returns an answer based on the ingested book content
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QueryRequest'
+      responses:
+        '200':
+          description: Successful response with answer and sources
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Bad request - invalid input format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      tags:
+        - Query
+components:
+  schemas:
+    QueryRequest:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          description: The natural language question to answer
+          example: "What are the key principles of quantum computing?"
+    QueryResponse:
+      type: object
+      required:
+        - answer
+        - sources
+      properties:
+        answer:
+          type: string
+          description: The generated answer based on book content
+          example: "Quantum computing relies on the principles of superposition and entanglement..."
+        sources:
+          type: array
+          description: List of source documents used to generate the answer
+          items:
+            $ref: '#/components/schemas/SourceCitation'
+    SourceCitation:
+      type: object
+      required:
+        - source_file
+        - chapter
+        - section
+      properties:
+        source_file:
+          type: string
+          description: Name of the source file
+          example: "quantum-physics-book.md"
+        chapter:
+          type: string
+          description: Chapter title or identifier
+          example: "Introduction to Quantum Computing"
+        section:
+          type: string
+          description: Section title or identifier
+          example: "Basic Principles"
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+          example: "Internal server error occurred"
+tags:
+  - name: Query
+    description: Endpoints for querying book content using RAG

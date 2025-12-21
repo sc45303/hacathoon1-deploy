@@ -42,9 +42,11 @@
 6. **Create environment file**:
    Copy the example environment file:
    ```bash
-   cp .env.example .env
+   copy .env.example .env  # On Windows
+   # or
+   cp .env.example .env    # On macOS/Linux
    ```
-   
+
    You can modify values in `.env` if needed, but defaults should work for initial testing.
 
 7. **Start the development server**:
@@ -64,7 +66,7 @@
    {
      "status": "healthy",
      "message": "Backend is operational",
-     "timestamp": "2025-12-16T10:30:00Z"
+     "timestamp": "2025-12-16T10:30:00"
    }
    ```
 
@@ -80,12 +82,12 @@ The backend follows a modular architecture:
 ```
 backend/
 ├── app/
-│   ├── main.py          # Application entry point
+│   ├── main.py          # Application entry point with health endpoint
 │   ├── api/             # API routes (v1)
 │   ├── core/            # Configuration and logging
 │   ├── services/        # Service layer (future use)
 │   ├── db/              # Database connectors (future use)
-│   └── models/          # Pydantic models (future use)
+│   └── models/          # Pydantic models (with HealthResponse model)
 ├── scripts/             # Utility scripts (future use)
 ├── requirements.txt     # Python dependencies
 ├── .env.example         # Environment variable template
@@ -96,8 +98,8 @@ backend/
 
 After verifying the backend skeleton is working:
 
-1. Implement database connectors in the `/db` directory
-2. Add data models in the `/models` directory
-3. Create service layer functionality in `/services`
-4. Add API endpoints in `/api/v1/`
+1. Implement database connectors in the `/app/db` directory
+2. Add data models in the `/app/models` directory
+3. Create service layer functionality in `/app/services`
+4. Add API endpoints in `/app/api/v1/`
 5. Implement the RAG logic in the service layer
