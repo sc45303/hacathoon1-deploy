@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import React, { useEffect, useRef, useState } from "react";
-import "./ChatbotWidget.css"; // हम नीचे CSS भी देंगे
+import "./ChatbotWidget.css";
 
 const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +13,7 @@ const ChatbotWidget = () => {
   const API_BASE_URL =
     typeof window !== "undefined" && import.meta?.env?.VITE_BACKEND_URL
       ? import.meta.env.VITE_BACKEND_URL
-      : "http://localhost:8000";
+      : "https://sk3078-rag-chatbot.hf.space";
 
   const toggleChatbot = () => setIsOpen((prev) => !prev);
 
