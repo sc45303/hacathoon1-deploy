@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 """
-Main ingestion script for the book ingestion pipeline.
-
-This script orchestrates the full ingestion flow:
-1. Reads markdown files from a directory
-2. Parses and extracts text content
-3. Chunks the text
-4. Generates embeddings
-5. Stores content and embeddings in respective databases
+Main ingestion script for the book ingestion pipeline with forced re-ingestion.
 """
 
 import argparse
@@ -16,18 +9,18 @@ import logging
 import os
 import sys
 from datetime import datetime
-from typing import Dict, List, Any
 from dotenv import load_dotenv
 load_dotenv()
-# Add parent directory to path to import ingestion modules
+
+# Add parent directory to path
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from app.ingestion.reader import read_markdown_files, extract_text_from_markdown
-from app.ingestion.chunker import chunk_text, calculate_tokens
+from app.ingestion.chunker import chunk_text
 from app.ingestion.embedder import generate_embedding
-from app.ingestion.storage import store_chunk, upsert_embedding, chunk_exists
+from app.ingestion.storage import store_chunk, upsert_embedding
+from app.db.qdrant import QdrantDB  # <-- Yeh import add karo
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -37,54 +30,57 @@ logger = logging.getLogger(__name__)
 
 async def main():
     parser = argparse.ArgumentParser(description="Book Ingestion Pipeline")
-    parser.add_argument("--source-dir", required=True, 
-                        help="Path to the directory containing markdown files")
-    parser.add_argument("--book-id", required=True, 
-                        help="Identifier for the book being ingested")
-    parser.add_argument("--chunk-size", type=int, default=400,
-                        help="Number of tokens per chunk (default: 400)")
-    parser.add_argument("--overlap", type=int, default=50,
-                        help="Number of overlapping tokens (default: 50)")
-    parser.add_argument("--run-identifier", 
-                        help="Custom identifier for this ingestion run")
-    parser.add_argument("--dry-run", action="store_true",
-                        help="Run script without writing to databases")
+    parser.add_argument("--source-dir", required=True, help="Path to markdown files directory")
+    parser.add_argument("--book-id", required=True, help="Book identifier")
+    parser.add_argument("--chunk-size", type=int, default=400)
+    parser.add_argument("--overlap", type=int, default=50)
+    parser.add_argument("--run-identifier", help="Custom run ID")
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--force-reingest", action="store_true",  # <-- Nayi flag
+                        help="Delete existing collection before ingestion")
     
     args = parser.parse_args()
     
     logger.info(f"Starting ingestion for book: {args.book_id}")
     logger.info(f"Source directory: {args.source_dir}")
-    logger.info(f"Chunk size: {args.chunk_size}, Overlap: {args.overlap}")
     
-    if args.dry_run:
-        logger.info("DRY RUN MODE: No database writes will occur")
-    
-    # Generate a run identifier if not provided
-    run_identifier = args.run_identifier or f"{args.book_id}-{datetime.now().strftime('%Y-%m-%d-%H-%M')}"
+    run_identifier = args.run_identifier or f"{args.book_id}-{datetime.now().strftime('%Y%m%d-%H%M')}"
     logger.info(f"Run identifier: {run_identifier}")
     
-    # Initialize counters for progress tracking
-    total_files = 0
-    processed_files = 0
-    total_chunks = 0
-    chunks_stored = 0
-    embeddings_stored = 0
+    # Initialize Qdrant client
+    qdrant_db = QdrantDB()
+    collection_name = os.getenv("QDRANT_COLLECTION_NAME", "test-clustor")
+    
+    # FORCE RE-INGEST: Delete old collection if flag is set
+    if args.force_reingest:
+        logger.info(f"Force re-ingest enabled: Deleting existing collection '{collection_name}'...")
+        try:
+            await qdrant_db.delete_collection(collection_name)
+            logger.info(f"Successfully deleted collection '{collection_name}'")
+        except Exception as e:
+            logger.warning(f"Could not delete collection (might not exist): {e}")
+    
+    # Recreate collection (optional but recommended)
+    try:
+        await qdrant_db.create_collection(collection_name)
+        logger.info(f"Collection '{collection_name}' ready for ingestion")
+    except Exception as e:
+        logger.info(f"Collection already exists or error creating: {e}")
+    
+    if args.dry_run:
+        logger.info("DRY RUN MODE ENABLED")
+    
+    total_files = processed_files = total_chunks = chunks_stored = embeddings_stored = 0
     
     try:
-        # Step 1: Read markdown files
-        logger.info("Step 1: Reading markdown files...")
         markdown_files = read_markdown_files(args.source_dir)
         total_files = len(markdown_files)
         logger.info(f"Found {total_files} markdown files")
         
-        # Process each markdown file
         for i, md_file in enumerate(markdown_files):
-            logger.info(f"Processing file {i+1}/{total_files}: {md_file['file_path']}")
+            logger.info(f"Processing {i+1}/{total_files}: {md_file['file_path']}")
             
-            # Extract text content from markdown
             text_content = extract_text_from_markdown(md_file['content'])
-            
-            # Chunk the text
             chunks = chunk_text(
                 text=text_content,
                 source_file=md_file['file_path'],
@@ -92,102 +88,71 @@ async def main():
                 overlap=args.overlap
             )
             
-            # Process each chunk
             for j, chunk in enumerate(chunks):
-                logger.debug(f"Processing chunk {j+1}/{len(chunks)} of {md_file['file_path']}")
-                
-                # Check for idempotency - skip if chunk already exists
-                chunk_exists = False
-                    
-                # If in dry run mode, skip database operations
                 if args.dry_run:
-                    logger.info(f"Dry run: Would process chunk {chunk['chunk_id']}")
                     continue
                 
                 try:
-                    # Store text chunk in Neon Postgres
+                    # Store in Neon
                     chunk_id = await store_chunk({
                         **chunk,
                         'book_id': args.book_id,
-                        'chapter': extract_chapter_from_path(md_file['file_path']),  # Extract chapter from path
-                        'section': extract_section_from_content(text_content, j)   # Extract section from content
+                        'chapter': extract_chapter_from_path(md_file['file_path']),
+                        'section': extract_section_from_content(text_content, j)
                     })
                     
                     if chunk_id:
                         chunks_stored += 1
-                        logger.debug(f"Stored chunk {chunk_id}")
                     
-                    # Generate embedding for the chunk
+                    # Generate embedding
                     embedding = await generate_embedding(chunk['content'])
                     
-                    # Prepare payload for Qdrant with reference to Neon record
+                    # PAYLOAD MEIN CONTENT SABSE UPAR AUR ZAROORI
                     payload = {
-                    "content": chunk['content'],      # ← Yeh nayi line sabse upar
-                    "chunk_id": chunk_id,
-                    "chunk_hash": chunk['chunk_hash'],
-                    "book_id": args.book_id,
-                    "chapter": extract_chapter_from_path(md_file['file_path']),
-                    "section": extract_section_from_content(text_content, j),
-                    "source_file": chunk['source_file'],
-                    "chunk_index": chunk['chunk_index']
-}
+                        "content": chunk['content'],  # <-- Yeh first rakho
+                        "chunk_id": chunk_id,
+                        "chunk_hash": chunk['chunk_hash'],
+                        "book_id": args.book_id,
+                        "chapter": extract_chapter_from_path(md_file['file_path']),
+                        "section": extract_section_from_content(text_content, j),
+                        "source_file": chunk['source_file'],
+                        "chunk_index": chunk['chunk_index']
+                    }
                     
-                    # Store embedding in Qdrant
+                    # Upsert in Qdrant
                     success = await upsert_embedding(embedding, payload)
-                    
                     if success:
                         embeddings_stored += 1
-                        logger.debug(f"Stored embedding for chunk {chunk_id}")
                     
                     total_chunks += 1
                     
                 except Exception as e:
-                    logger.error(f"Error processing chunk from {md_file['file_path']}: {e}")
-                    # Continue with other chunks/files instead of stopping
+                    logger.error(f"Error processing chunk: {e}")
                     continue
             
             processed_files += 1
-            logger.info(f"Completed processing {md_file['file_path']}")
         
-        # Print summary
         logger.info("=== INGESTION SUMMARY ===")
         logger.info(f"Files processed: {processed_files}/{total_files}")
-        logger.info(f"Chunks processed: {total_chunks}")
-        logger.info(f"Chunks stored in Neon: {chunks_stored}")
-        logger.info(f"Embeddings stored in Qdrant: {embeddings_stored}")
+        logger.info(f"Total chunks: {total_chunks}")
+        logger.info(f"Chunks stored: {chunks_stored}")
+        logger.info(f"Embeddings stored: {embeddings_stored}")
+        logger.info("INGESTION COMPLETE WITH FRESH DATA!")
         
-        if args.dry_run:
-            logger.info("DRY RUN COMPLETE: No data was written to databases")
-        else:
-            logger.info("INGESTION COMPLETE: Data successfully written to databases")
-        
-        return True
-    
     except Exception as e:
         logger.error(f"Ingestion failed: {e}")
         return False
+    
+    return True
 
 
 def extract_chapter_from_path(file_path: str) -> str:
-    """
-    Extract chapter information from the file path.
-    This is a simple implementation - in practice you might have more sophisticated logic.
-    """
-    # Example: if path is 'docs/python-basics/variables.md', extract 'python-basics'
     import os.path
     directory = os.path.dirname(file_path)
-    if directory:
-        return os.path.basename(directory)
-    else:
-        return "root"
+    return os.path.basename(directory) if directory else "root"
 
 
 def extract_section_from_content(content: str, chunk_index: int) -> str:
-    """
-    Extract section information from content.
-    This is a simple implementation - in practice you might parse headers or other structure.
-    """
-    # For now, just return a default section or derive from content
     return f"Section_{chunk_index}"
 
 
