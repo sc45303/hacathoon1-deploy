@@ -19,7 +19,7 @@ const config: Config = {
     },
   },
 
-  url: "https://physicalai-course.com",
+  url: "https://hacathoon1-deploy.vercel.app",
   baseUrl: "/",
 
   organizationName: "physicalai-course",
